@@ -1,0 +1,98 @@
+package structs
+
+import (
+	"log"
+	"os"
+	"path/filepath"
+	"strings"
+)
+
+var METADATA_FILES = []string{
+	"package.json",     // node.js
+	"requirements.txt", // python
+	"pom.xml",          // java(mvn)
+	"conan.conf",       // c++/conan
+	"Cargo.toml",       // rust/cargo
+	"java.config",      // maven
+	"maven.config",     // duh
+}
+
+type Filesystem struct {
+	Root string `json:"root"`
+}
+
+func NewFilesystem(root string) Filesystem {
+
+	var filesystem Filesystem
+
+	filesystem.SetRoot(root)
+
+	return filesystem
+
+}
+
+func (filesystem *Filesystem) SetRoot(root string) {
+
+	stat, err := os.Stat(root)
+
+	if err == nil && stat.IsDir() {
+		filesystem.Root = root
+	}
+
+}
+
+func (filesystem *Filesystem) Scan() []string {
+
+	var result []string
+
+	err := filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
+		if info.IsDir() == false {
+
+			var name = info.Name()
+
+			for m := 0; m < len(METADATA_FILES); m++ {
+
+				if name == METADATA_FILES[m] {
+					result = append(result, path)
+					break
+				}
+
+			}
+
+		}
+
+		return nil
+
+	})
+
+	if err != nil {
+		log.Println(err)
+	}
+
+	return result
+
+}
+
+func (filesystem *Filesystem) Read(file string) []byte {
+
+	var result []byte
+
+	if strings.HasPrefix(file, "/") == false {
+		file = "/" + file
+	}
+
+	stat, err1 := os.Stat(filesystem.Root + file)
+
+	if err1 == nil && stat.IsDir() == false {
+
+		buffer, err2 := os.ReadFile(filesystem.Root + file)
+
+		if err2 == nil {
+			result = buffer
+		}
+
+	}
+
+	return result
+
+}
