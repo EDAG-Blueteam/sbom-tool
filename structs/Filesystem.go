@@ -7,14 +7,14 @@ import (
 	"strings"
 )
 
-var METADATA_FILES = []string{
-	"package.json",     // node.js
-	"requirements.txt", // python
-	"pom.xml",          // java(mvn)
-	"conan.conf",       // c++/conan
-	"Cargo.toml",       // rust/cargo
-	"java.config",      // maven
-	"maven.config",     // duh
+var METADATA_FILES = map[string]string{
+	"package.json":     "npm",   // node.js
+	"requirements.txt": "pypi",  // python
+	"pom.xml":          "maven", // java(mvn)
+	"conan.conf":       "conan", // c++/conan
+	"Cargo.toml":       "cargo", // rust/cargo
+	"java.config":      "maven", // maven
+	"maven.config":     "maven", // duh
 }
 
 type Filesystem struct {
@@ -41,19 +41,24 @@ func (filesystem *Filesystem) SetRoot(root string) {
 
 }
 
-func (filesystem *Filesystem) Scan() []string {
+func (filesystem *Filesystem) Scan() []ResultInfo {
 
-	var result []string
+	var result []ResultInfo // should be changed to struct to contain path with metadata type
 
 	err := filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
 		if info.IsDir() == false {
 
 			var name = info.Name()
 
-			for m := 0; m < len(METADATA_FILES); m++ {
+			for key, val := range METADATA_FILES {
 
-				if name == METADATA_FILES[m] {
-					result = append(result, path)
+				if key == name {
+
+					result = append(result, ResultInfo{
+						Path: path,
+						Type: val,
+					})
+
 					break
 				}
 
