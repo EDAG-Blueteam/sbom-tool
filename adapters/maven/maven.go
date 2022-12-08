@@ -1,19 +1,18 @@
 package maven
 
 import (
-	"sbom-tool/structs"
 	"encoding/xml"
 	"fmt"
 	"os"
+	"sbom-tool/structs"
 )
 
 type Maven struct {
-
 }
 
 func (m *Maven) Generate(file string) []byte {
 
-	var result []byte;
+	var result []byte
 
 	buffer, err := os.ReadFile(file)
 
@@ -30,7 +29,7 @@ func (m *Maven) Generate(file string) []byte {
 				var found Plugin
 
 				for p := 0; p < len(schema.Build.Plugins); p++ {
-					
+
 					var plugin = schema.Build.Plugins[p]
 
 					if plugin.GroupId == "org.cyclonedx" && plugin.ArtifactId == "cyclonedx-maven-plugin" {
@@ -62,11 +61,9 @@ func (m *Maven) Generate(file string) []byte {
 
 		}
 
-
 		fmt.Println(schema)
 
 	}
-	
 
 	// TODO: Read maven config file into schema
 	// TODO: Find out target folder (after build success)
