@@ -2,9 +2,12 @@ package maven
 
 import (
 	"encoding/xml"
+	"errors"
 	"fmt"
+	"log"
 	"os"
 	"sbom-tool/structs"
+	"sbom-tool/utils"
 )
 
 type Maven struct {
@@ -62,6 +65,25 @@ func (m *Maven) Generate(file string) []byte {
 		}
 
 		fmt.Println(schema)
+		if pomXml, err := xml.MarshalIndent(schema, "", "    "); err == nil {
+
+			path := "workingDir"
+			if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
+				err := os.Mkdir(path, os.ModePerm)
+				if err != nil {
+					log.Println(err)
+				}
+			}
+
+			err := os.WriteFile("workingDir/pom.xml", pomXml, 0644)
+			if err != nil {
+				log.Fatal("Error writing modified injected pom.xml")
+			} else {
+				utils.ExecCmd("mvn", "cyclonedx:makeBom", "-f", "workingDir/pom.xml")
+			}
+		} else {
+			log.Fatal("Error marshalling XML")
+		}
 
 	}
 
