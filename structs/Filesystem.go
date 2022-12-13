@@ -8,13 +8,14 @@ import (
 )
 
 var METADATA_FILES = map[string]string{
-	"package.json":     "npm",   // node.js
-	"requirements.txt": "pypi",  // python
-	"pom.xml":          "maven", // java(mvn)
-	"conan.conf":       "conan", // c++/conan
-	"Cargo.toml":       "cargo", // rust/cargo
-	"java.config":      "maven", // maven
-	"maven.config":     "maven", // duh
+	"package.json":     "npm",    // node.js
+	"requirements.txt": "pypi",   // python
+	"pom.xml":          "maven",  // java(mvn)
+	"conan.conf":       "conan",  // c++/conan
+	"Cargo.toml":       "cargo",  // rust/cargo
+	"java.config":      "maven",  // maven
+	"maven.config":     "maven",  // duh
+	"build.gradle":     "gradle", // java (gradle)
 }
 
 type Filesystem struct {
