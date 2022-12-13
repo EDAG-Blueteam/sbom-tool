@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sbom-tool/adapters/gradle"
 	"sbom-tool/adapters/maven"
 	"sbom-tool/adapters/npm"
 	"sbom-tool/interfaces"
@@ -31,6 +32,8 @@ func main() {
 				processBuild = &maven.Maven{}
 			case "npm":
 				processBuild = &npm.NPM{}
+			case "gradle":
+				processBuild = &gradle.Gradle{}
 			// case "conan":
 
 			// case "pypi":
