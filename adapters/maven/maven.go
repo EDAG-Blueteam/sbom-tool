@@ -68,6 +68,7 @@ func (m *Maven) Generate(file string) []byte {
 
 		// Marshall Structs to XML
 		fmt.Println("New appended plugins structs: \n", schema)
+
 		if pomXml, err := xml.MarshalIndent(schema, "", "    "); err == nil {
 
 			path := "SBOMWorkingDir"
@@ -96,7 +97,14 @@ func (m *Maven) Generate(file string) []byte {
 	// TODO: Find out target folder (after build success)	-> Done
 	// TODO: Inject cyclonedx maven plugin					-> Done
 	// TODO: Run build process (and wait)					-> Done
-	// TODO: Read target/bom.json							-> Pending
+	// TODO: Create the Sbom								-> Done
+	// TODO: Verify that the sbom is created				-> Pending
+	// TODO: Find out why the Sbom wasnt created
+	// 		in Hazim										-> Pending
+	// TODO: Read target/sbom.json							-> Pending
+
+	//!!
+	// TODO: merge multiple sbom and send to backend		-> Pending
 
 	return result
 

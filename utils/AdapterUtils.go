@@ -12,6 +12,8 @@ func ExecCmd(name string, args ...string) (string, error) {
 	var cmd *exec.Cmd
 
 	if IsWindows() {
+		// mvn what ever
+		// cmd.exe /C mvn what ever
 		winArgs := append([]string{"/C", name}, args...)
 		cmd = exec.Command("cmd", winArgs...)
 	} else {

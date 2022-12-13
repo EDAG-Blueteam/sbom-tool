@@ -1,9 +1,21 @@
 package npm
 
+import (
+	"fmt"
+	"path/filepath"
+	"sbom-tool/structs"
+)
+
 type NPM struct {
 }
 
 func (npm *NPM) Generate(file string) []byte {
+
+	var shell = structs.NewShell(filepath.Dir(file))
+
+	_, err := shell.Execute("npm", []string{"install", "--save-dev", "@cyclonedx/cyclonedx-npm"})
+
+	fmt.Println(err)
 
 	return nil
 }
