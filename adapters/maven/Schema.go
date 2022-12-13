@@ -6,7 +6,6 @@ import (
 )
 
 type Build struct {
-	// TODO: final name ?
 	Plugins []Plugin `xml:"plugins>plugin"`
 }
 

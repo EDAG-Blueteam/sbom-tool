@@ -21,24 +21,24 @@ func ExecCmd(name string, args ...string) (string, error) {
 	stdout, err := cmd.StdoutPipe()
 
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return "", err
 	}
 
 	if err := cmd.Start(); err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return "", err
 	}
 
 	data, err := io.ReadAll(stdout)
 
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return "", err
 	}
 
 	if err := cmd.Wait(); err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return "", err
 	}
 

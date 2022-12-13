@@ -43,15 +43,23 @@ func (filesystem *Filesystem) SetRoot(root string) {
 
 func (filesystem *Filesystem) Scan() []ResultInfo {
 
-	var result []ResultInfo // should be changed to struct to contain path with metadata type
+	var result []ResultInfo
 
 	err := filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
+
+		// Exclude unused path
+		// TODO exclude all file that start with "."
+		if info.IsDir() &&
+			(info.Name() == ".git" || info.Name() == "SBOMWorkingDir" || info.Name() == ".idea") {
+			return filepath.SkipDir
+		}
+		log.Printf("Visited: %s\n", path)
+
 		if info.IsDir() == false {
 
 			var name = info.Name()
 
 			for key, val := range METADATA_FILES {
-
 				if key == name {
 
 					result = append(result, ResultInfo{
@@ -61,13 +69,9 @@ func (filesystem *Filesystem) Scan() []ResultInfo {
 
 					break
 				}
-
 			}
-
 		}
-
 		return nil
-
 	})
 
 	if err != nil {

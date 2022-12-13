@@ -15,3 +15,8 @@ func IsPackage(file string) bool {
 	return result
 
 }
+
+func (npm *NPM) BuildToolsExist() bool {
+	//TODO implement me
+	return true
+}
