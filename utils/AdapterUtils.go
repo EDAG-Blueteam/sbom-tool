@@ -1,9 +1,11 @@
 package utils
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"log"
+	"os"
 	"os/exec"
 	"runtime"
 )
@@ -50,4 +52,21 @@ func ExecCmd(name string, args ...string) (string, error) {
 
 func IsWindows() bool {
 	return runtime.GOOS == "windows"
+}
+
+/*
+Create a working directory folder if not exist
+
+@param path folder to be created
+@return nil
+*/
+func CreateFolder(path string) error {
+	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
+		err := os.MkdirAll(path, os.ModePerm)
+		if err != nil {
+			log.Println(err)
+			return err
+		}
+	}
+	return nil
 }

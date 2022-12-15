@@ -18,9 +18,15 @@ var TOOLCHAINS = map[string]interfaces.ProcessBuilder{
 
 var TOOLCHAINS_AVAILABLE = map[string]bool{
 	"maven": TOOLCHAINS["maven"].BuildToolsExist(),
-	"npm":   TOOLCHAINS["maven"].BuildToolsExist(),
+	"npm":   TOOLCHAINS["npm"].BuildToolsExist(),
 }
 
+/*
+Retrieves the adapter and check if the program support it
+
+@param adapter
+@return process_builder
+*/
 func toProcessBuilder(adapter string) interfaces.ProcessBuilder {
 
 	var process_builder interfaces.ProcessBuilder
