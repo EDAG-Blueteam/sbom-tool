@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"sbom-tool/adapters/gradle"
 	"sbom-tool/adapters/maven"
 	"sbom-tool/adapters/npm"
 	"sbom-tool/console"
@@ -14,11 +15,13 @@ import (
 var TOOLCHAINS = map[string]interfaces.ProcessBuilder{
 	"maven": &maven.Maven{},
 	"npm":   &npm.NPM{},
+	"gradle": &gradle.Gradle{},
 }
 
 var TOOLCHAINS_AVAILABLE = map[string]bool{
 	"maven": TOOLCHAINS["maven"].BuildToolsExist(),
 	"npm":   TOOLCHAINS["npm"].BuildToolsExist(),
+	"gradle": TOOLCHAINS["gradle"].BuildToolsExist(),
 }
 
 /*
