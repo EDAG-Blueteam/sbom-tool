@@ -62,12 +62,11 @@ func (filesystem *Filesystem) Scan() []ResultInfo {
 
 			for key, val := range METADATA_FILES {
 				if key == name {
-
 					result = append(result, ResultInfo{
 						Path: path,
 						Type: val,
+						Uuid: CreateProjectUuid(path),
 					})
-
 					break
 				}
 			}

@@ -12,11 +12,11 @@ import (
 type Maven struct {
 }
 
-func (m *Maven) Generate(file string) []byte {
+func (m *Maven) Generate(resultInfo structs.ResultInfo) []byte {
 
 	var result []byte
 
-	buffer, err := os.ReadFile(file)
+	buffer, err := os.ReadFile(resultInfo.Path)
 
 	if err == nil {
 
@@ -70,55 +70,29 @@ func (m *Maven) Generate(file string) []byte {
 
 		if pomXml, err := xml.MarshalIndent(schema, "", "    "); err == nil {
 
-			//path := "SBOMWorkingDir"
-			//if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
-			//	err := os.Mkdir(path, os.ModePerm)
-			//	if err != nil {
-			//		log.Println(err)
-			//	}
-			//}
-
-			err := utils.CreateFolder("SBOMWorkingDir")
+			workingDir := "SBOMWorkingDir/" + resultInfo.Uuid + "/"
+			err := utils.CreateFolder(workingDir)
 			if err != nil {
 				fmt.Println("Unable to create SBOMWorkingDir !! ")
 			}
 
 			// Generate SBOM
-			err = os.WriteFile("SBOMWorkingDir/pom.xml", pomXml, 0644)
+			err = os.WriteFile(workingDir+"pom.xml", pomXml, 0644)
 			if err != nil {
 				log.Fatal("Error writing modified injected pom.xml")
 			} else {
 				// TODO add checker if the SBOM successfully created
-				utils.ExecCmd("mvn", "cyclonedx:makeBom", "-f", "SBOMWorkingDir/pom.xml")
+				utils.ExecCmd("mvn", "cyclonedx:makeBom", "-f", workingDir+"pom.xml")
+				result, err = os.ReadFile(workingDir + "/target/bom.json")
+				if err != nil {
+					log.Println("Error reading created bom.json, err:", err)
+				}
 			}
 		} else {
 			log.Fatal("Error marshalling XML")
 		}
 
 	}
-
-	// TODO: Read maven config file into schema 			-> Done
-	// TODO: Find out target folder (after build success)	-> Done
-	// TODO: Inject cyclonedx maven plugin					-> Done
-	// TODO: Run build process (and wait)					-> Done
-	// TODO: Create the Sbom								-> Done
-	// TODO: Verify that the sbom is created				-> Pending
-	// TODO: Find out why the Sbom wasnt created
-	// 		in Hazim										-> Pending
-	// TODO: Read target/sbom.json							-> Pending
-
-	//!!
-	// TODO: merge multiple sbom and send to backend		-> Pending
-
-	return result
-
-}
-
-func IsPackage(resultInfo structs.ResultInfo) bool {
-
-	var result bool = false
-
-	// TODO: Validate file for being a pom.xml -> Pending
 
 	return result
 

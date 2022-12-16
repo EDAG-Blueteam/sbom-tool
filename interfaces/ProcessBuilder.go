@@ -1,6 +1,8 @@
 package interfaces
 
+import "sbom-tool/structs"
+
 type ProcessBuilder interface {
 	BuildToolsExist() bool
-	Generate(file string) []byte
+	Generate(resultInfo structs.ResultInfo) []byte
 }

@@ -1,7 +1,6 @@
 package npm
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -12,44 +11,41 @@ import (
 type NPM struct {
 }
 
-func (npm *NPM) Generate(file string) []byte {
+func (npm *NPM) Generate(resultInfo structs.ResultInfo) []byte {
 
-	err := utils.CreateFolder("SBOMWorkingDir/npmWorkingDir")
+	workingDir := "SBOMWorkingDir/" + resultInfo.Uuid + "/"
+	err := utils.CreateFolder(workingDir)
 	if err != nil {
-		fmt.Println("Unable to create SBOMWorkingDir/npmWorkingDir !! ")
+		log.Printf("Unable to create %v !! ", workingDir)
 	}
 
-	input, err := os.ReadFile(file)
+	input, err := os.ReadFile(resultInfo.Path)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 
 	}
 
-	err = os.WriteFile("SBOMWorkingDir/npmWorkingDir/package.json", input, 0644)
+	err = os.WriteFile(workingDir+"package.json", input, 0644)
 	if err != nil {
-		fmt.Println("Error creating file in SBOMWorkingDir/npmWorkingDir")
-		fmt.Println(err)
+		log.Println("Error creating file in SBOMWorkingDir/npmWorkingDir")
+		log.Println(err)
 	}
 
-	var shell = structs.NewShell(filepath.Dir("SBOMWorkingDir/npmWorkingDir/package.json"))
+	var shell = structs.NewShell(filepath.Dir(workingDir + "package.json"))
 
 	// Execute npm sbom installation command
 	_, err = shell.Execute("npm", []string{"install", "--save-dev", "@cyclonedx/cyclonedx-npm"})
 
 	// Execute npm sbom generation command
 	_, err = shell.Execute("npx", []string{"@cyclonedx/cyclonedx-npm", "--output-file", "sbom.json"})
-
-	fmt.Println(err)
-
-	return nil
-}
-
-func IsPackage(file string) bool {
-
-	var result bool = false
-
+	if err != nil {
+		log.Println("Error executing npm/npx shell command, err:", err)
+	}
+	result, err := os.ReadFile(workingDir + "sbom.json")
+	if err != nil {
+		log.Println("Error reading created bom.json, err:", err)
+	}
 	return result
-
 }
 
 func (npm *NPM) BuildToolsExist() bool {
