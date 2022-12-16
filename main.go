@@ -2,16 +2,62 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"sbom-tool/adapters/gradle"
 	"sbom-tool/adapters/maven"
 	"sbom-tool/adapters/npm"
+	"sbom-tool/console"
 	"sbom-tool/interfaces"
 	"sbom-tool/structs"
+	"strings"
 )
 
+var TOOLCHAINS = map[string]interfaces.ProcessBuilder{
+	"maven": &maven.Maven{},
+	"npm":   &npm.NPM{},
+	"gradle": &gradle.Gradle{},
+}
+
+var TOOLCHAINS_AVAILABLE = map[string]bool{
+	"maven": TOOLCHAINS["maven"].BuildToolsExist(),
+	"npm":   TOOLCHAINS["npm"].BuildToolsExist(),
+	"gradle": TOOLCHAINS["gradle"].BuildToolsExist(),
+}
+
+/*
+Retrieves the adapter and check if the program support it
+
+@param adapter
+@return process_builder
+*/
+func toProcessBuilder(adapter string) interfaces.ProcessBuilder {
+
+	var process_builder interfaces.ProcessBuilder
+
+	if TOOLCHAINS_AVAILABLE[adapter] == true {
+
+		if TOOLCHAINS[adapter] != nil {
+			process_builder = TOOLCHAINS[adapter]
+		} else {
+			console.Error("main: Sorry, we didn't implement support for \"" + adapter + "\" yet!")
+		}
+
+	} else {
+		console.Error("main: Please install the toolchain for \"" + adapter + "\"!")
+	}
+
+	return process_builder
+
+}
+
 func main() {
+
+	var adapter string
+
+	if len(os.Args) == 2 {
+		// sbom-tool <adapter>
+		adapter = strings.TrimSpace(os.Args[1])
+	}
 
 	cwd, err := os.Getwd()
 
@@ -22,31 +68,17 @@ func main() {
 
 		for f := 0; f < len(resultInfos); f++ {
 
-			var processBuild interfaces.ProcessBuilder
+			var process_builder interfaces.ProcessBuilder
 			var resultInfo = resultInfos[f]
 
-			fmt.Println(resultInfo)
-
-			switch resultInfo.Type {
-			case "maven":
-				processBuild = &maven.Maven{}
-			case "npm":
-				processBuild = &npm.NPM{}
-			case "gradle":
-				processBuild = &gradle.Gradle{}
-			// case "conan":
-
-			// case "pypi":
-
-			// case "rust":
-
-			default:
-				log.Println("file found does not match the provided metadata. damn")
-				continue
+			if adapter == "" {
+				process_builder = toProcessBuilder(resultInfo.Type)
+			} else {
+				process_builder = toProcessBuilder(adapter)
 			}
 
-			if processBuild != nil {
-				processBuild.Generate(resultInfo.Path)
+			if process_builder != nil {
+				process_builder.Generate(resultInfo.Path)
 			}
 
 		}
@@ -54,5 +86,4 @@ func main() {
 	} else {
 		fmt.Println("You gotta be root, stoopid!")
 	}
-
 }
