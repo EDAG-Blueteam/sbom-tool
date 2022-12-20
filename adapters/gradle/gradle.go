@@ -4,6 +4,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"sbom-tool/console"
 	"sbom-tool/structs"
 	"sbom-tool/utils"
 )
@@ -13,9 +14,13 @@ type Gradle struct {
 
 func (m *Gradle) Generate(file string) []byte {
 
-	InjectGradlePlugin()
+	InjectGradlePlugin(file)
 
-	utils.ExecCmd("gradle", "cyclonedxBom", "--build-file", "cyclonedxBuild.gradle")
+	_, err := utils.ExecCmd("gradle", "cyclonedxBom")
+
+	if err != nil {
+		console.Error(err.Error())
+	}
 
 	return nil
 }
@@ -44,14 +49,14 @@ func (m *Gradle) BuildToolsExist() bool {
 	return true
 }
 
-func InjectGradlePlugin() {
-	newGradleFile, err := os.Create("cyclonedxBuild.gradle")
+func InjectGradlePlugin(file string) {
+	newGradleFile, err := os.Create("build.gradle")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer newGradleFile.Close()
 
-	gradleFile, err2 := os.Open("./build.gradle")
+	gradleFile, err2 := os.Open(file)
 	if err2 != nil {
 		log.Fatal(err2)
 	}
