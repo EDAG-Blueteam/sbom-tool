@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 )
 
@@ -48,10 +49,10 @@ func (filesystem *Filesystem) Scan() []ResultInfo {
 
 	err := filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
 
-		// Exclude unused path
-		// TODO exclude all file that start with "."
+		// skip unused path
+		match, _ := regexp.MatchString("\\.\\w+", info.Name())
 		if info.IsDir() &&
-			(info.Name() == ".git" || info.Name() == "SBOMWorkingDir" || info.Name() == ".idea") {
+			(info.Name() == "SBOMWorkingDir" || match) {
 			return filepath.SkipDir
 		}
 		log.Printf("Visited: %s\n", path)
