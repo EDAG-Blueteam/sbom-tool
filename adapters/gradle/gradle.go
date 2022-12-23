@@ -1,6 +1,7 @@
 package gradle
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -16,7 +17,7 @@ func (m *Gradle) Generate(file string) []byte {
 
 	InjectGradlePlugin(file)
 
-	_, err := utils.ExecCmd("gradle", "cyclonedxBom")
+	_, err := utils.ExecCmd("gradle", "cyclonedxBom", "--build-file", "SBOMWorkingDir/build.gradle")
 
 	if err != nil {
 		console.Error(err.Error())
@@ -50,7 +51,12 @@ func (m *Gradle) BuildToolsExist() bool {
 }
 
 func InjectGradlePlugin(file string) {
-	newGradleFile, err := os.Create("build.gradle")
+	err := utils.CreateFolder("SBOMWorkingDir")
+	if err != nil {
+		fmt.Println("Unable to create SBOMWorkingDir !! ")
+	}
+
+	newGradleFile, err := os.Create("SBOMWorkingDir/build.gradle")
 	if err != nil {
 		log.Fatal(err)
 	}
