@@ -81,8 +81,12 @@ func (m *Maven) Generate(resultInfo structs.ResultInfo) []byte {
 			if err != nil {
 				log.Fatal("Error writing modified injected pom.xml")
 			} else {
+				var shell = structs.NewShell(workingDir)
 				// TODO add checker if the SBOM successfully created
-				utils.ExecCmd("mvn", "cyclonedx:makeBom", "-f", workingDir+"pom.xml")
+				_, err := shell.Execute("mvn", []string{"cyclonedx:makeBom"})
+				if err != nil {
+					log.Println("Error executing maven cyclonedx command, err:", err)
+				}
 				result, err = os.ReadFile(workingDir + "/target/bom.json")
 				if err != nil {
 					log.Println("Error reading created bom.json, err:", err)
@@ -100,7 +104,9 @@ func (m *Maven) Generate(resultInfo structs.ResultInfo) []byte {
 
 func (m *Maven) BuildToolsExist() bool {
 
-	output, err := utils.ExecCmd("mvn", "-v")
+	cwd, _ := os.Getwd()
+	var shell = structs.NewShell(cwd)
+	output, err := shell.Execute("mvn", []string{"-v"})
 
 	if err != nil {
 		log.Println("Cannot execute maven")

@@ -50,7 +50,9 @@ func (npm *NPM) Generate(resultInfo structs.ResultInfo) []byte {
 
 func (npm *NPM) BuildToolsExist() bool {
 
-	output, err := utils.ExecCmd("npm", "-v")
+	cwd, _ := os.Getwd()
+	var shell = structs.NewShell(cwd)
+	output, err := shell.Execute("npm", []string{"-v"})
 
 	if err != nil {
 		log.Println("Cannot execute npm")
