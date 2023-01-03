@@ -14,7 +14,7 @@ var (
 	ErrCreateSbomRequest = errors.New("failed to create SBOM request")
 )
 
-func sendSbom(restPath string, content []byte) error {
+func SendSbom(restPath string, content []byte) error {
 	request, err := http.NewRequest("POST", "http://some-dummy-url", bytes.NewBuffer(content))
 	if err != nil {
 		return ErrCreateSbomRequest
