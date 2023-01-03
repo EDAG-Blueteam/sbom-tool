@@ -6,10 +6,12 @@ import (
 	"os"
 )
 
-// parseCycloneDXSbom takes the sbom json file absolute path.
-// It opens the file and parse the json
-// It returns the sbom as a struct
-func parseCycloneDxSbom(filePath string) (*CycloneDxSbom, error) {
+/*
+parseCycloneDXSbom takes the sbom json file absolute path.
+It opens the file and parse the json
+It returns the sbom as a struct
+*/
+func ParseCycloneDxSbom(filePath string) (*CycloneDxSbom, error) {
 	content, err := os.ReadFile(filePath)
 	if err != nil {
 		log.Printf("%s cannot be opened", filePath)
