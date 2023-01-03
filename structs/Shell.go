@@ -60,6 +60,7 @@ func (shell *Shell) Execute(command string, arguments []string) (string, error) 
 		cmd_out, cmd_err := cmd.Output()
 
 		stdout = string(cmd_out)
+		console.Log(stdout)
 		err = cmd_err
 
 		if err != nil {
