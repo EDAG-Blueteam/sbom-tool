@@ -1,6 +1,7 @@
 package structs
 
 import (
+	"io/fs"
 	"log"
 	"os"
 	"path/filepath"
@@ -47,7 +48,7 @@ func (filesystem *Filesystem) Scan() []ResultInfo {
 
 	var result []ResultInfo
 
-	err := filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
+	err := filepath.WalkDir(".", func(path string, info fs.DirEntry, err error) error {
 
 		// skip unused path
 		match, _ := regexp.MatchString("\\.\\w+", info.Name())
