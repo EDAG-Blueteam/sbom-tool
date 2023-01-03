@@ -11,11 +11,6 @@ type Build struct {
 
 type Configuration struct {
 	Value string `xml:",innerxml"`
-	//XMLName  xml.Name  `xml:"configuration,omitempty"`
-	//Url      string    `xml:"url,omitempty"`
-	//Timeout  int       `xml:"timeout,omitempty"`
-	//Options  []string  `xml:"options>option,omitempty"`
-	//Excludes []Exclude `xml:"excludes>exclude,omitempty"`
 }
 
 type DependencyManagement struct {
