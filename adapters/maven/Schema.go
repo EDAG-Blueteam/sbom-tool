@@ -10,10 +10,7 @@ type Build struct {
 }
 
 type Configuration struct {
-	XMLName xml.Name `xml:"configuration,omitempty"`
-	Url     string   `xml:"url,omitempty"`
-	Timeout int      `xml:"timeout,omitempty"`
-	Options []string `xml:"options>option,omitempty"`
+	Value string `xml:",innerxml"`
 }
 
 type DependencyManagement struct {
@@ -50,13 +47,7 @@ type Plugin struct {
 	ArtifactId string   `xml:"artifactId,omitempty"`
 	Version    string   `xml:"version,omitempty,omitempty"`
 
-	// TODO: This might not work
 	Configuration Configuration `xml:"configuration,omitempty"`
-
-	// https://maven.apache.org/guides/mini/guide-configuring-plugins.html
-	// TODO something like: Configuration map[string]string `xml:"configuration"`
-	// TODO executions
-
 }
 
 type PluginRepository struct {

@@ -13,11 +13,21 @@ import (
 type Gradle struct {
 }
 
-func (m *Gradle) Generate(file string) []byte {
+func (m *Gradle) Generate(resultInfo structs.ResultInfo) []byte {
 
-	InjectGradlePlugin(file)
+	InjectGradlePlugin(resultInfo.Path)
 
-	_, err := utils.ExecCmd("gradle", "cyclonedxBom", "--build-file", "SBOMWorkingDir/build.gradle")
+	workingDir := "SBOMWorkingDir/" + resultInfo.Uuid + "/"
+
+	var shell = structs.NewShell(workingDir)
+
+	var gradleArgument = []string{
+		"cyclonedxBom",
+		"--build-file",
+		"SBOMWorkingDir/build.gradle",
+	}
+	_, err := shell.Execute("gradle", gradleArgument)
+	// _, err := utils.ExecCmd("gradle", "cyclonedxBom", "--build-file", "SBOMWorkingDir/build.gradle")
 
 	if err != nil {
 		console.Error(err.Error())
@@ -38,7 +48,9 @@ func IsPackage(resultInfo structs.ResultInfo) bool {
 
 func (m *Gradle) BuildToolsExist() bool {
 
-	output, err := utils.ExecCmd("gradle", "-v")
+	cwd, _ := os.Getwd()
+	var shell = structs.NewShell(cwd)
+	output, err := shell.Execute("gradle", []string{"-v"})
 
 	if err != nil {
 		log.Println("Cannot execute gradle")
@@ -46,6 +58,15 @@ func (m *Gradle) BuildToolsExist() bool {
 	}
 
 	log.Println("The gradle version is : ", output)
+
+	// output, err := utils.ExecCmd("gradle", "-v")
+
+	// if err != nil {
+	// 	log.Println("Cannot execute gradle")
+	// 	return false
+	// }
+
+	// log.Println("The gradle version is : ", output)
 
 	return true
 }

@@ -1,9 +1,11 @@
 package structs
 
 import (
+	"io/fs"
 	"log"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 )
 
@@ -46,12 +48,12 @@ func (filesystem *Filesystem) Scan() []ResultInfo {
 
 	var result []ResultInfo
 
-	err := filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
+	err := filepath.WalkDir(".", func(path string, info fs.DirEntry, err error) error {
 
-		// Exclude unused path
-		// TODO exclude all file that start with "."
+		// skip unused path
+		match, _ := regexp.MatchString("\\.\\w+", info.Name())
 		if info.IsDir() &&
-			(info.Name() == ".git" || info.Name() == "SBOMWorkingDir" || info.Name() == ".idea") {
+			(info.Name() == "SBOMWorkingDir" || match) {
 			return filepath.SkipDir
 		}
 		log.Printf("Visited: %s\n", path)
@@ -62,12 +64,11 @@ func (filesystem *Filesystem) Scan() []ResultInfo {
 
 			for key, val := range METADATA_FILES {
 				if key == name {
-
 					result = append(result, ResultInfo{
 						Path: path,
 						Type: val,
+						Uuid: CreateProjectUuid(path),
 					})
-
 					break
 				}
 			}

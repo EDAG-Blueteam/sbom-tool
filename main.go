@@ -13,14 +13,14 @@ import (
 )
 
 var TOOLCHAINS = map[string]interfaces.ProcessBuilder{
-	"maven": &maven.Maven{},
-	"npm":   &npm.NPM{},
+	"maven":  &maven.Maven{},
+	"npm":    &npm.NPM{},
 	"gradle": &gradle.Gradle{},
 }
 
 var TOOLCHAINS_AVAILABLE = map[string]bool{
-	"maven": TOOLCHAINS["maven"].BuildToolsExist(),
-	"npm":   TOOLCHAINS["npm"].BuildToolsExist(),
+	"maven":  TOOLCHAINS["maven"].BuildToolsExist(),
+	"npm":    TOOLCHAINS["npm"].BuildToolsExist(),
 	"gradle": TOOLCHAINS["gradle"].BuildToolsExist(),
 }
 
@@ -78,7 +78,8 @@ func main() {
 			}
 
 			if process_builder != nil {
-				process_builder.Generate(resultInfo.Path)
+				// TODO make it as a gorountine to run all the adapters concurrently
+				process_builder.Generate(resultInfo)
 			}
 
 		}
