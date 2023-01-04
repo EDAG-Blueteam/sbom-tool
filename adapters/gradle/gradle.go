@@ -15,7 +15,11 @@ type Gradle struct {
 
 func (m *Gradle) Generate(resultInfo structs.ResultInfo) []byte {
 
-	InjectGradlePlugin(resultInfo.Path)
+	injecterr := InjectGradlePlugin(resultInfo.Path)
+
+	if injecterr != nil {
+		console.Error(injecterr.Error())
+	}
 
 	workingDir := "SBOMWorkingDir/" + resultInfo.Uuid + "/"
 
@@ -34,16 +38,6 @@ func (m *Gradle) Generate(resultInfo structs.ResultInfo) []byte {
 	}
 
 	return nil
-}
-
-func IsPackage(resultInfo structs.ResultInfo) bool {
-
-	var result bool = false
-
-	// TODO: validate gradle file
-
-	return result
-
 }
 
 func (m *Gradle) BuildToolsExist() bool {
@@ -71,21 +65,22 @@ func (m *Gradle) BuildToolsExist() bool {
 	return true
 }
 
-func InjectGradlePlugin(file string) {
+func InjectGradlePlugin(file string) error {
 	err := utils.CreateFolder("SBOMWorkingDir")
 	if err != nil {
 		fmt.Println("Unable to create SBOMWorkingDir !! ")
+		return err
 	}
 
 	newGradleFile, err := os.Create("SBOMWorkingDir/build.gradle")
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	defer newGradleFile.Close()
 
 	gradleFile, err2 := os.Open(file)
 	if err2 != nil {
-		log.Fatal(err2)
+		return err
 	}
 
 	defer gradleFile.Close()
@@ -96,6 +91,7 @@ func InjectGradlePlugin(file string) {
 
 	_, err3 := io.Copy(newGradleFile, gradleFile)
 	if err3 != nil {
-		log.Fatal(err3)
+		return err
 	}
+	return nil
 }
