@@ -63,7 +63,7 @@ func main() {
 
 	if err == nil {
 
-		var filesystem = structs.NewFilesystem(cwd)
+		var filesystem = structs.NewFilesystem(projectDirectoryPath)
 		var resultInfos = filesystem.Scan()
 
 		for f := 0; f < len(resultInfos); f++ {
