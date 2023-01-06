@@ -52,20 +52,13 @@ func toProcessBuilder(adapter string) interfaces.ProcessBuilder {
 
 func main() {
 
-	var adapter string
-
-	if len(os.Args) == 2 {
-		// sbom-tool <adapter>
-		adapter = strings.TrimSpace(os.Args[1])
-	}
-
 	cwd, err := os.Getwd()
 
 	var projectDirectoryPath string
 	var adapter string
 
 	flag.StringVar(&adapter, "adapter", "", "Adapter selection. If not specified it will scan all existing adapters")
-	flag.StringVar(&projectDirectoryPath, "projectDirectory", cwd, "path to project directory")
+	flag.StringVar(&projectDirectoryPath, "projectDirectory", cwd, "Path to project directory")
 	flag.Parse()
 
 	if err == nil {

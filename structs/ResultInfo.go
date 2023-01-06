@@ -14,8 +14,11 @@ type ResultInfo struct {
 
 func CreateProjectUuid(path string) string {
 	uuid, _ := uuid2.NewUUID()
-	pathUuid := strings.Replace(path, "\\", "-", -1)
+	pathUuid := strings.Replace(path, ":", "", -1)
+	pathUuid = strings.Replace(pathUuid, "\\", "-", -1)
 	pathUuid = strings.Replace(pathUuid, "/", "-", -1)
+	pathUuid = strings.TrimPrefix(pathUuid, "-")
+
 	projectUuid := fmt.Sprintf("%s-%s", pathUuid, uuid.String())
 	return projectUuid
 }
