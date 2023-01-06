@@ -48,7 +48,7 @@ func (filesystem *Filesystem) Scan() []ResultInfo {
 
 	var result []ResultInfo
 
-	err := filepath.WalkDir(".", func(path string, info fs.DirEntry, err error) error {
+	err := filepath.WalkDir(filesystem.Root, func(path string, info fs.DirEntry, err error) error {
 
 		// skip unused path
 		match, _ := regexp.MatchString("\\.\\w+", info.Name())
