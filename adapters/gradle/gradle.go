@@ -5,7 +5,6 @@ import (
 	"io"
 	"log"
 	"os"
-	"sbom-tool/console"
 	"sbom-tool/structs"
 	"sbom-tool/utils"
 )
@@ -14,30 +13,33 @@ type Gradle struct {
 }
 
 func (m *Gradle) Generate(resultInfo structs.ResultInfo) []byte {
-
-	injecterr := InjectGradlePlugin(resultInfo.Path)
-
-	if injecterr != nil {
-		console.Error(injecterr.Error())
-	}
-
 	workingDir := "SBOMWorkingDir/" + resultInfo.Uuid + "/"
+
+	injectErr := InjectGradlePlugin(workingDir, resultInfo.Path)
+
+	if injectErr != nil {
+		log.Println("Error injecting cycloneDx plugin to build.gradle, ", injectErr)
+	}
 
 	var shell = structs.NewShell(workingDir)
 
 	var gradleArgument = []string{
 		"cyclonedxBom",
-		"--build-file",
-		"SBOMWorkingDir/build.gradle",
 	}
 	_, err := shell.Execute("gradle", gradleArgument)
-	// _, err := utils.ExecCmd("gradle", "cyclonedxBom", "--build-file", "SBOMWorkingDir/build.gradle")
 
 	if err != nil {
-		console.Error(err.Error())
+		log.Println("Error executing sbom generation cmd for Gradle, ", err)
+		return nil
 	}
 
-	return nil
+	result, err := os.ReadFile(workingDir + "build/reports/bom.json")
+
+	if err != nil {
+		log.Println("Error reading created bom.json, err:", err)
+	}
+
+	return result
 }
 
 func (m *Gradle) BuildToolsExist() bool {
@@ -53,26 +55,17 @@ func (m *Gradle) BuildToolsExist() bool {
 
 	log.Println("The gradle version is : ", output)
 
-	// output, err := utils.ExecCmd("gradle", "-v")
-
-	// if err != nil {
-	// 	log.Println("Cannot execute gradle")
-	// 	return false
-	// }
-
-	// log.Println("The gradle version is : ", output)
-
 	return true
 }
 
-func InjectGradlePlugin(file string) error {
-	err := utils.CreateFolder("SBOMWorkingDir")
+func InjectGradlePlugin(workingDir string, file string) error {
+	err := utils.CreateFolder(workingDir)
 	if err != nil {
 		fmt.Println("Unable to create SBOMWorkingDir !! ")
 		return err
 	}
 
-	newGradleFile, err := os.Create("SBOMWorkingDir/build.gradle")
+	newGradleFile, err := os.Create(workingDir + "build.gradle")
 	if err != nil {
 		return err
 	}
