@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"sbom-tool/adapters/gradle"
@@ -9,7 +10,6 @@ import (
 	"sbom-tool/console"
 	"sbom-tool/interfaces"
 	"sbom-tool/structs"
-	"strings"
 )
 
 var TOOLCHAINS = map[string]interfaces.ProcessBuilder{
@@ -52,18 +52,18 @@ func toProcessBuilder(adapter string) interfaces.ProcessBuilder {
 
 func main() {
 
+	cwd, err := os.Getwd()
+
+	var projectDirectoryPath string
 	var adapter string
 
-	if len(os.Args) == 2 {
-		// sbom-tool <adapter>
-		adapter = strings.TrimSpace(os.Args[1])
-	}
-
-	cwd, err := os.Getwd()
+	flag.StringVar(&adapter, "adapter", "", "Adapter selection. If not specified it will scan all existing adapters")
+	flag.StringVar(&projectDirectoryPath, "projectDirectory", cwd, "Path to project directory")
+	flag.Parse()
 
 	if err == nil {
 
-		var filesystem = structs.NewFilesystem(cwd)
+		var filesystem = structs.NewFilesystem(projectDirectoryPath)
 		var resultInfos = filesystem.Scan()
 
 		for f := 0; f < len(resultInfos); f++ {

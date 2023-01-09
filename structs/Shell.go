@@ -3,7 +3,6 @@ package structs
 import (
 	"os"
 	"os/exec"
-	"path/filepath"
 	"runtime"
 	"sbom-tool/console"
 	"strings"
@@ -14,22 +13,16 @@ type Shell struct {
 	Warnings []string `json:"warnings"`
 }
 
-func NewShell(folder string) Shell {
+func NewShell(workingDir string) Shell {
 
 	var shell Shell
 
-	cwd, err1 := os.Getwd()
+	stat, err2 := os.Stat(workingDir)
 
-	if err1 == nil {
-
-		stat, err2 := os.Stat(filepath.Join(cwd, folder))
-
-		if err2 == nil && stat.IsDir() {
-			shell.Folder = filepath.Join(cwd, folder)
-		} else {
-			console.Warn("Shell: \"" + folder + "\" does not exist!")
-		}
-
+	if err2 == nil && stat.IsDir() {
+		shell.Folder = workingDir
+	} else {
+		console.Warn("Shell: \"" + workingDir + "\" does not exist!")
 	}
 
 	return shell
@@ -68,7 +61,7 @@ func (shell *Shell) Execute(command string, arguments []string) (string, error) 
 		}
 
 	} else {
-		console.Warn("Shell: Forgot to set folder!")
+		console.Error("Shell: Forgot to set folder!")
 	}
 
 	return stdout, err

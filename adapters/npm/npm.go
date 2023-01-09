@@ -3,7 +3,6 @@ package npm
 import (
 	"log"
 	"os"
-	"path/filepath"
 	"sbom-tool/structs"
 	"sbom-tool/utils"
 )
@@ -31,7 +30,7 @@ func (npm *NPM) Generate(resultInfo structs.ResultInfo) []byte {
 		log.Println(err)
 	}
 
-	var shell = structs.NewShell(filepath.Dir(workingDir + "package.json"))
+	var shell = structs.NewShell(workingDir)
 
 	// Execute npm sbom installation command
 	_, err = shell.Execute("npm", []string{"install", "--save-dev", "@cyclonedx/cyclonedx-npm"})
